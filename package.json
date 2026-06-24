@@ -1,0 +1,12 @@
+{
+  "name": "aaenterprises",
+  "version": "1.0.0",
+  "description": "AA Enterprises corporate website",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y browser-sync start --server --files \"index.html, style.css, app.js\" --port 3000"
+  },
+  "keywords": [],
+  "author": "AA Enterprises",
+  "license": "ISC"
+}
