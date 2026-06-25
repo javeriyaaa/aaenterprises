@@ -74,6 +74,8 @@ const CATEGORIES = {
 };
 
 export default function Home() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
   // Navigation & Scroll states
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -320,7 +322,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         <div className="nav-container">
           <a href="#home" className="logo" onClick={() => setMobileMenuOpen(false)}>
             <img 
-              src="/logo.png" 
+              src={`${basePath}/logo.png`} 
               alt="AA Enterprises Logo" 
               style={{ height: "38px", width: "38px", objectFit: "contain", marginRight: "0.25rem" }} 
             />
@@ -455,7 +457,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                   {/* Central 3D Glowing Node */}
                   <div className="flow-center-3d">
                     <div className="flow-center-inner-3d">
-                      <img src="/logo.png" alt="AA Logo" className="flow-center-logo-3d" />
+                      <img src={`${basePath}/logo.png`} alt="AA Logo" className="flow-center-logo-3d" />
                       <span className="flow-center-text-3d">AA Enterprises</span>
                     </div>
                   </div>
@@ -536,7 +538,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                   }}
                 >
                   <div className="card-image-box">
-                    <img src={`/${imgName}`} alt={cat.title} />
+                    <img src={`${basePath}/${imgName}`} alt={cat.title} />
                     <div className="card-image-overlay"></div>
                     <span className="card-category-icon"><i className={cat.icon}></i></span>
                   </div>
@@ -919,7 +921,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }}>
               <div className="gallery-image-box">
-                <img src="/gallery_it_waste.png" alt="IT Park Server Room Decommissioning" />
+                <img src={`${basePath}/gallery_it_waste.png`} alt="IT Park Server Room Decommissioning" />
                 <div className="gallery-overlay">
                   <span className="gallery-tag">Corporate E-Waste</span>
                   <h3 className="gallery-card-title">Server Room Decommissioning</h3>
@@ -934,10 +936,10 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }}>
               <div className="gallery-image-box">
-                <img src="/gallery_chiller_scrap.png" alt="Central AC Chiller Plant Dismantling" />
+                <img src={`${basePath}/gallery_chiller_scrap.png`} alt="Central AC Chiller Plant Dismantling" />
                 <div className="gallery-overlay">
                   <span className="gallery-tag">Chiller Plants</span>
-                  <h3 class="gallery-card-title">AC Chiller Plant Dismantling</h3>
+                  <h3 className="gallery-card-title">AC Chiller Plant Dismantling</h3>
                   <p className="gallery-card-desc">Logistics and safe dismantling of a 300-ton central rooftop air conditioning unit and copper cooling towers.</p>
                 </div>
               </div>
@@ -949,7 +951,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }}>
               <div className="gallery-image-box">
-                <img src="/gallery_heavy_machinery.png" alt="Industrial Generator Salvage" />
+                <img src={`${basePath}/gallery_heavy_machinery.png`} alt="Industrial Generator Salvage" />
                 <div className="gallery-overlay">
                   <span className="gallery-tag">Heavy Machinery</span>
                   <h3 className="gallery-card-title">Industrial Generator Salvage</h3>
@@ -964,7 +966,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }}>
               <div className="gallery-image-box">
-                <img src="/gallery_copper_scrap.png" alt="Bulk Copper Cable Clearance" />
+                <img src={`${basePath}/gallery_copper_scrap.png`} alt="Bulk Copper Cable Clearance" />
                 <div className="gallery-overlay">
                   <span className="gallery-tag">Electrical Scrap</span>
                   <h3 className="gallery-card-title">Bulk Copper Cable Clearance</h3>
@@ -1139,7 +1141,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         <div className="footer-grid">
           <div className="footer-col">
             <a href="#home" className="logo" style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-              <img src="/logo.png" alt="AA Enterprises Logo" style={{ height: "38px", width: "38px", objectFit: "contain" }} />
+              <img src={`${basePath}/logo.png`} alt="AA Enterprises Logo" style={{ height: "38px", width: "38px", objectFit: "contain" }} />
               <div className="logo-text">AA<span>Enterprises</span></div>
             </a>
             <p className="footer-desc">
