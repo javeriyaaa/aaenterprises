@@ -16,37 +16,37 @@ const DAILY_RATES = [
 
 const ITEM_VALUATIONS = {
   // IT
-  "Laptops": { min: 2500, max: 4800, unit: "unit", defaultQty: 5 },
-  "Desktop Computers": { min: 1800, max: 3200, unit: "unit", defaultQty: 5 },
-  "Server Racks": { min: 8000, max: 25000, unit: "unit", defaultQty: 1 },
-  "UPS & Lead Batteries": { min: 92, max: 105, unit: "kg", defaultQty: 100 },
-  "Office Printers": { min: 1200, max: 3500, unit: "unit", defaultQty: 2 },
+  "Laptops": { unit: "unit", defaultQty: 5 },
+  "Desktop Computers": { unit: "unit", defaultQty: 5 },
+  "Server Racks": { unit: "unit", defaultQty: 1 },
+  "UPS & Lead Batteries": { unit: "kg", defaultQty: 100 },
+  "Office Printers": { unit: "unit", defaultQty: 2 },
   
   // AC
-  "Split AC Units": { min: 4200, max: 5500, unit: "unit", defaultQty: 2 },
-  "Window AC Units": { min: 3000, max: 4500, unit: "unit", defaultQty: 2 },
-  "Centralized Chiller Plants": { min: 120000, max: 450000, unit: "unit", defaultQty: 1 },
-  "Outdoor AC Condenser Units": { min: 1500, max: 2800, unit: "unit", defaultQty: 2 },
-  "AHU & Ducting": { min: 40, max: 55, unit: "kg", defaultQty: 200 },
-  "AC Copper Tubing": { min: 460, max: 520, unit: "kg", defaultQty: 50 },
+  "Split AC Units": { unit: "unit", defaultQty: 2 },
+  "Window AC Units": { unit: "unit", defaultQty: 2 },
+  "Centralized Chiller Plants": { unit: "unit", defaultQty: 1 },
+  "Outdoor AC Condenser Units": { unit: "unit", defaultQty: 2 },
+  "AHU & Ducting": { unit: "kg", defaultQty: 200 },
+  "AC Copper Tubing": { unit: "kg", defaultQty: 50 },
   
   // Cables & Wires
-  "Armoured Copper Cables": { min: 480, max: 525, unit: "kg", defaultQty: 100 },
-  "Aluminium Cables": { min: 145, max: 168, unit: "kg", defaultQty: 150 },
-  "Transformers": { min: 45000, max: 180000, unit: "unit", defaultQty: 1 },
-  "Distribution Panels": { min: 15000, max: 65000, unit: "unit", defaultQty: 1 },
+  "Armoured Copper Cables": { unit: "kg", defaultQty: 100 },
+  "Aluminium Cables": { unit: "kg", defaultQty: 150 },
+  "Transformers": { unit: "unit", defaultQty: 1 },
+  "Distribution Panels": { unit: "unit", defaultQty: 1 },
   
   // Generators
-  "Used Industrial DG Sets": { min: 75000, max: 350000, unit: "set", defaultQty: 1 },
-  "Portable & Commercial Generators": { min: 12000, max: 45000, unit: "unit", defaultQty: 1 },
-  "Large Alternators & Dynamos": { min: 8000, max: 35000, unit: "unit", defaultQty: 1 },
-  "Diesel Engine Parts": { min: 35, max: 45, unit: "kg", defaultQty: 200 },
+  "Used Industrial DG Sets": { unit: "set", defaultQty: 1 },
+  "Portable & Commercial Generators": { unit: "unit", defaultQty: 1 },
+  "Large Alternators & Dynamos": { unit: "unit", defaultQty: 1 },
+  "Diesel Engine Parts": { unit: "kg", defaultQty: 200 },
   
   // Metals
-  "Iron & Steel Scrap": { min: 38, max: 44, unit: "kg", defaultQty: 500 },
-  "Pure Copper Scrap": { min: 620, max: 680, unit: "kg", defaultQty: 50 },
-  "Brass Casting Scrap": { min: 340, max: 385, unit: "kg", defaultQty: 100 },
-  "Aluminium Scrap": { min: 135, max: 155, unit: "kg", defaultQty: 150 }
+  "Iron & Steel Scrap": { unit: "kg", defaultQty: 500 },
+  "Pure Copper Scrap": { unit: "kg", defaultQty: 50 },
+  "Brass Casting Scrap": { unit: "kg", defaultQty: 100 },
+  "Aluminium Scrap": { unit: "kg", defaultQty: 150 }
 };
 
 const CATEGORIES = {
@@ -197,21 +197,6 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate dynamic valuation range
-  const calculateValuationRange = () => {
-    let minTotal = 0;
-    let maxTotal = 0;
-    selectedItems.forEach(item => {
-      const qty = itemQuantities[item] || 0;
-      const val = ITEM_VALUATIONS[item];
-      if (val) {
-        minTotal += val.min * qty;
-        maxTotal += val.max * qty;
-      }
-    });
-    return { min: minTotal, max: maxTotal };
-  };
-
   // 3D Capsule click behavior
   const handle3DNodeClick = (category, item) => {
     const el = document.getElementById("estimator");
@@ -293,15 +278,10 @@ export default function Home() {
       const ticketId = `AAE-2026-${randomId}`;
 
       const waPhone = "919845189902"; // Ashfaque Ahmed
-      const valuationRange = calculateValuationRange();
 
       const itemsList = selectedItems.length > 0 
         ? selectedItems.map(item => `• ${item}: ${itemQuantities[item]} ${ITEM_VALUATIONS[item]?.unit || "units"}`).join("\n") 
         : "• General Bulk Scrap Audit";
-
-      const valText = valuationRange.min > 0
-        ? `\n*Est. Payout Range:* ₹${valuationRange.min.toLocaleString('en-IN')} - ₹${valuationRange.max.toLocaleString('en-IN')} (Bengaluru Market Rates)\n`
-        : "";
 
       const waMessage = `Hi AA Enterprises! I have submitted a scrap pickup inquiry.
 
@@ -310,7 +290,7 @@ export default function Home() {
 *Phone:* ${pickupForm.phone}
 ${pickupForm.email ? `*Email:* ${pickupForm.email}\n` : ""}${pickupForm.company ? `*Company:* ${pickupForm.company}\n` : ""}*Items to Sell:*
 ${itemsList}
-${valText}
+
 *Location & Details:*
 ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attached: ${uploadedFiles.length} photos of scrap]` : ""}`;
 
@@ -328,7 +308,6 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         message: pickupForm.message,
         items: selectedItems,
         quantities: { ...itemQuantities },
-        valuationRange: valuationRange,
         photoUrls: photoUrls,
         whatsappUrl: waUrl
       });
@@ -776,25 +755,6 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
             <div className="estimator-summary" style={{ backgroundColor: "var(--bg-surface)", padding: "3rem", display: "flex", flexDirection: "column", justifyContent: "flex-start", border: "1px solid var(--border-color)", borderRadius: "20px", position: "relative" }}>
               {!successTicket ? (
                 <div id="pickup-form-wrapper">
-                  {/* Real-time Payout Valuation Range Box */}
-                  <div className="valuation-display-box">
-                    <div className="val-label">Indicative Valuation Range</div>
-                    <div className="val-amount">
-                      {selectedItems.length > 0 ? (
-                        <>
-                          ₹{calculateValuationRange().min.toLocaleString('en-IN')} - ₹{calculateValuationRange().max.toLocaleString('en-IN')}
-                        </>
-                      ) : (
-                        "₹0"
-                      )}
-                    </div>
-                    <div className="val-subtext">
-                      {selectedItems.length > 0 
-                        ? "*Based on indicative daily Bangalore spot rates" 
-                        : "Select items on the left to calculate indicative value"}
-                    </div>
-                  </div>
-
                   <h3 className="estimator-title" style={{ marginBottom: "2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
                     <i className="fa-solid fa-user-pen"></i> 2. Contact Details
                   </h3>
@@ -938,9 +898,6 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                               <div key={idx} className="receipt-tag" style={{ display: "block", marginBottom: "0.5rem" }}>
                                 <i className="fa-solid fa-check" style={{ color: "var(--primary-light)" }}></i> 
                                 <strong style={{ color: "var(--text-primary)" }}> {item}</strong>: {qty} {valInfo?.unit || "units"} 
-                                <span style={{ color: "var(--text-secondary)", fontSize: "0.75rem", marginLeft: "0.5rem" }}>
-                                  (Indicative: ₹{(valInfo?.min * qty).toLocaleString('en-IN')} - ₹{(valInfo?.max * qty).toLocaleString('en-IN')})
-                                </span>
                               </div>
                             );
                           })
@@ -951,16 +908,6 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                         )}
                       </div>
                     </div>
-
-                    {successTicket.valuationRange && successTicket.valuationRange.min > 0 && (
-                      <div className="receipt-section" style={{ background: "rgba(255,255,255,0.01)", border: "1px solid var(--border-color)", padding: "1rem", borderRadius: "8px" }}>
-                        <h4 style={{ color: "var(--primary-light)" }}>Estimated Payout Range</h4>
-                        <p style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--primary-light)", fontFamily: "var(--font-heading)" }}>
-                          ₹{successTicket.valuationRange.min.toLocaleString('en-IN')} - ₹{successTicket.valuationRange.max.toLocaleString('en-IN')}
-                        </p>
-                        <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", marginTop: "0.25rem" }}>*Valuation is indicative and finalized post calibrated digital scale weight checks.</span>
-                      </div>
-                    )}
                     
                     {successTicket.message && (
                       <div className="receipt-section">
