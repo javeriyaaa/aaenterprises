@@ -134,12 +134,12 @@ header.scrolled {
 
 .logo img,
 .flow-center-logo-3d {
-  filter: brightness(0) invert(1);
+  filter: hue-rotate(-55deg) saturate(1.8) brightness(1.2) drop-shadow(0 0 6px rgba(0, 210, 255, 0.4));
   transition: var(--transition-smooth);
 }
 
 .logo:hover img {
-  filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  filter: hue-rotate(-55deg) saturate(2) brightness(1.3) drop-shadow(0 0 12px rgba(0, 210, 255, 0.6));
 }
 
 .logo-text {
