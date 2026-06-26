@@ -120,6 +120,401 @@ const CATEGORIES = {
   }
 };
 
+
+// ==========================================
+// Interactive Components & Datasets
+// ==========================================
+
+function CountUpNumber({ end, duration = 1500, suffix = "" }) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    setStarted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(Math.floor(progress * end));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [end, duration, started]);
+
+  return <span>{count.toLocaleString()}{suffix}</span>;
+}
+
+const TREND_DATA = {
+  copper: {
+    title: "Copper Armoured Cables (Price Trend)",
+    unit: "₹/kg",
+    min: 450,
+    max: 550,
+    points: [
+      { month: "Jan", val: 480 },
+      { month: "Feb", val: 495 },
+      { month: "Mar", val: 490 },
+      { month: "Apr", val: 510 },
+      { month: "May", val: 505 },
+      { month: "Jun", val: 525 }
+    ]
+  },
+  servers: {
+    title: "IT Server Blade Units (Price Trend)",
+    unit: "₹/unit",
+    min: 3000,
+    max: 4800,
+    points: [
+      { month: "Jan", val: 3200 },
+      { month: "Feb", val: 3350 },
+      { month: "Mar", val: 3600 },
+      { month: "Apr", val: 3800 },
+      { month: "May", val: 4100 },
+      { month: "Jun", val: 4500 }
+    ]
+  },
+  steel: {
+    title: "Heavy Structural Steel (Price Trend)",
+    unit: "₹/kg",
+    min: 35,
+    max: 48,
+    points: [
+      { month: "Jan", val: 38 },
+      { month: "Feb", val: 39 },
+      { month: "Mar", val: 41 },
+      { month: "Apr", val: 40 },
+      { month: "May", val: 43 },
+      { month: "Jun", val: 44 }
+    ]
+  }
+};
+
+function PriceTrendChart() {
+  const [activeTrend, setActiveTrend] = useState("copper");
+  const [hoveredPoint, setHoveredPoint] = useState(null);
+  
+  const currentData = TREND_DATA[activeTrend];
+  
+  const width = 800;
+  const height = 240;
+  const paddingX = 60;
+  const paddingY = 40;
+  
+  const pointsCount = currentData.points.length;
+  const stepX = (width - paddingX * 2) / (pointsCount - 1);
+  
+  const getCoordinates = (val, index) => {
+    const x = paddingX + index * stepX;
+    const ratio = (val - currentData.min) / (currentData.max - currentData.min);
+    const y = height - paddingY - ratio * (height - paddingY * 2);
+    return { x, y };
+  };
+  
+  const coords = currentData.points.map((p, idx) => getCoordinates(p.val, idx));
+  
+  let pathD = "";
+  coords.forEach((c, idx) => {
+    if (idx === 0) pathD = `M ${c.x} ${c.y}`;
+    else pathD += ` L ${c.x} ${c.y}`;
+  });
+  
+  const gridLinesCount = 4;
+  const gridLines = Array.from({ length: gridLinesCount }).map((_, idx) => {
+    const ratio = idx / (gridLinesCount - 1);
+    const y = paddingY + ratio * (height - paddingY * 2);
+    const val = currentData.max - ratio * (currentData.max - currentData.min);
+    return { y, val: Math.round(val) };
+  });
+
+  return (
+    <div className="price-trend-card">
+      <div className="chart-header">
+        <div>
+          <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "1.25rem", color: "var(--text-primary)", marginBottom: "0.25rem" }}>
+            {currentData.title}
+          </h3>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+            Indicative industrial commodity price indexes (6-Month Trend)
+          </p>
+        </div>
+        
+        <div className="chart-tabs">
+          <button 
+            className={`chart-tab-btn ${activeTrend === "copper" ? "active" : ""}`}
+            onClick={() => { setActiveTrend("copper"); setHoveredPoint(null); }}
+          >
+            Copper
+          </button>
+          <button 
+            className={`chart-tab-btn ${activeTrend === "servers" ? "active" : ""}`}
+            onClick={() => { setActiveTrend("servers"); setHoveredPoint(null); }}
+          >
+            IT Servers
+          </button>
+          <button 
+            className={`chart-tab-btn ${activeTrend === "steel" ? "active" : ""}`}
+            onClick={() => { setActiveTrend("steel"); setHoveredPoint(null); }}
+          >
+            Structural Steel
+          </button>
+        </div>
+      </div>
+      
+      <div className="chart-svg-wrapper">
+        <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
+          {gridLines.map((line, idx) => (
+            <g key={idx}>
+              <line 
+                x1={paddingX} 
+                y1={line.y} 
+                x2={width - paddingX} 
+                y2={line.y} 
+                className="chart-grid-line"
+              />
+              <text 
+                x={paddingX - 10} 
+                y={line.y + 4} 
+                textAnchor="end" 
+                className="chart-axis-text"
+              >
+                {line.val} {idx === 0 ? currentData.unit : ""}
+              </text>
+            </g>
+          ))}
+          
+          {currentData.points.map((p, idx) => {
+            const c = coords[idx];
+            return (
+              <text 
+                key={idx}
+                x={c.x} 
+                y={height - paddingY + 22} 
+                textAnchor="middle" 
+                className="chart-axis-text"
+                style={{ fontWeight: "600" }}
+              >
+                {p.month}
+              </text>
+            );
+          })}
+          
+          {hoveredPoint && (
+            <line 
+              x1={hoveredPoint.x} 
+              y1={paddingY} 
+              x2={hoveredPoint.x} 
+              y2={height - paddingY} 
+              className="chart-guide-line"
+            />
+          )}
+          
+          <path d={pathD} className="chart-path" />
+          <path d={pathD} className="chart-path-glow" />
+          
+          {coords.map((c, idx) => {
+            const p = currentData.points[idx];
+            const isHovered = hoveredPoint && hoveredPoint.index === idx;
+            return (
+              <circle 
+                key={idx}
+                cx={c.x}
+                cy={c.y}
+                r={isHovered ? 8 : 6}
+                className="chart-dot"
+                onMouseEnter={() => setHoveredPoint({
+                  index: idx,
+                  x: c.x,
+                  y: c.y,
+                  val: p.val,
+                  month: p.month
+                })}
+                onMouseLeave={() => setHoveredPoint(null)}
+              />
+            );
+          })}
+        </svg>
+        
+        {hoveredPoint && (
+          <div 
+            className="chart-tooltip"
+            style={{ 
+              left: `${(hoveredPoint.x / width) * 100}%`,
+              top: `${(hoveredPoint.y / height) * 100 - 25}%`,
+              transform: "translate(-50%, -100%)"
+            }}
+          >
+            <span className="tooltip-date">{hoveredPoint.month} 2026</span>
+            <span className="tooltip-value">₹{hoveredPoint.val.toLocaleString()}{currentData.unit.includes("/") ? currentData.unit.substring(currentData.unit.indexOf("/")) : `/${currentData.unit}`}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const LOGISTICS_STEPS = [
+  {
+    title: "1. Inquiry Submit",
+    icon: "fa-solid fa-file-signature",
+    desc: "Submit your scrap quantities or schedule a corporate audit. Our logistics coordinators review specifications immediately."
+  },
+  {
+    title: "2. Dispatch",
+    icon: "fa-solid fa-truck-ramp-box",
+    desc: "We dispatch dedicated collection vehicles or qualified appraisers to your site with customized cargo configurations."
+  },
+  {
+    title: "3. Calibrated Weight",
+    icon: "fa-solid fa-scale-balanced",
+    desc: "Materials are sorted and weighed on-site using double-calibrated, government-certified weighing equipment in your presence."
+  },
+  {
+    title: "4. Settlement",
+    icon: "fa-solid fa-money-bill-transfer",
+    desc: "100% of the agreed transaction value is transferred instantly via IMPS, RTGS, or cash before materials leave the facility."
+  },
+  {
+    title: "5. Compliant Disposal",
+    icon: "fa-solid fa-recycle",
+    desc: "Recyclables are securely transported to state-authorized disposal plants. Full Green Certificates and destruction logs are provided."
+  }
+];
+
+function LogisticsTruckTracker() {
+  const [activeStep, setActiveStep] = useState(0);
+  const currentStepData = LOGISTICS_STEPS[activeStep];
+  const truckLeft = 5 + activeStep * 22.5;
+
+  return (
+    <div className="logistics-map-card">
+      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <span className="subtitle" style={{ color: "var(--primary)", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", fontSize: "0.75rem" }}>
+          Transparent Supply Chain
+        </span>
+        <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "1.75rem", color: "var(--text-primary)", marginTop: "0.25rem" }}>
+          Live Logistics & Pickup Pipeline
+        </h3>
+        <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", maxWidth: "550px", margin: "0.5rem auto 0" }}>
+          Track the journey of your corporate and industrial scrap from inquiry submission to certified recycling.
+        </p>
+      </div>
+
+      <div className="logistics-track-wrapper">
+        <div className="logistics-line-bg"></div>
+        <div className="logistics-line-progress" style={{ width: `${activeStep * 22.5}%` }}></div>
+        
+        <div 
+          className="logistics-truck-icon" 
+          style={{ left: `${truckLeft}%` }}
+        >
+          <i className="fa-solid fa-truck-moving"></i>
+        </div>
+        
+        <div className="logistics-steps-row">
+          {LOGISTICS_STEPS.map((step, idx) => {
+            const isActive = idx === activeStep;
+            const isCompleted = idx < activeStep;
+            return (
+              <div 
+                key={idx}
+                className={`logistics-step-node ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
+                onClick={() => setActiveStep(idx)}
+              >
+                <div className="logistics-step-circle">
+                  {isCompleted ? <i className="fa-solid fa-check" style={{ fontSize: "0.7rem" }}></i> : idx + 1}
+                </div>
+                <div className="logistics-step-label">
+                  {step.title.split(" ").slice(1).join(" ")}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="logistics-details-panel">
+        <div className="panel-icon">
+          <i className={currentStepData.icon}></i>
+        </div>
+        <div className="panel-content">
+          <h4>{currentStepData.title}</h4>
+          <p>{currentStepData.desc}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const FAQ_ITEMS = [
+  {
+    question: "What types of corporate scrap do you purchase?",
+    answer: "We purchase all types of corporate surplus, including blade servers, office laptops, centralized chiller plants, commercial generators, armoured copper cables, dynamos, electrical panels, and bulk metals from building deconstructions."
+  },
+  {
+    question: "How do you guarantee calibrated weight accuracy?",
+    answer: "We use digital industrial scales certified and stamped annually by the Department of Weights and Measures. Weighment is performed transparently in full view of your supervisors on-site."
+  },
+  {
+    question: "Will we receive green disposal and recycling certificates?",
+    answer: "Yes, we issue formal corporate recycling documents, green disposal compliance certificates, and technical destruction logs for security compliance audits."
+  },
+  {
+    question: "What is your payout settlement protocol?",
+    answer: "100% of the calculated asset value is paid instantly on-site via RTGS bank transfer, IMPS, or secure corporate payout, prior to load dispatch or vehicle release."
+  },
+  {
+    question: "Do you offer physical de-installation and hauling support?",
+    answer: "Absolutely. Our expert crew handles all physical de-installation, mechanical sorting, duct/wiring dismantling, structural load lifting, and logistics rigging without interrupting your operations."
+  }
+];
+
+function FAQAccordion() {
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
+
+  return (
+    <div className="faq-container">
+      {FAQ_ITEMS.map((item, idx) => {
+        const isActive = idx === activeIndex;
+        return (
+          <div 
+            key={idx} 
+            className={`faq-item ${isActive ? "active" : ""}`}
+          >
+            <button 
+              className="faq-header"
+              onClick={() => toggleFAQ(idx)}
+              aria-expanded={isActive}
+            >
+              <span className="faq-question">{item.question}</span>
+              <div className="faq-icon">
+                <i className="fa-solid fa-chevron-down"></i>
+              </div>
+            </button>
+            <div 
+              className="faq-answer-wrapper"
+              style={{ maxHeight: isActive ? "200px" : "0" }}
+            >
+              <div className="faq-answer">
+                {item.answer}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Home() {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
@@ -525,15 +920,15 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
 
               <div className="hero-stats">
                 <div className="stat-item">
-                  <span className="stat-number">35<span>+</span></span>
+                  <span className="stat-number"><CountUpNumber end={35} suffix="+" /></span>
                   <span className="stat-label">Years Experience</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-number">100,000<span>+</span></span>
+                  <span className="stat-number"><CountUpNumber end={100000} suffix="+" /></span>
                   <span className="stat-label">Clients Served</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-number">100<span>%</span></span>
+                  <span className="stat-number"><CountUpNumber end={100} suffix="%" /></span>
                   <span className="stat-label">Eco-Compliance</span>
                 </div>
               </div>
@@ -665,6 +1060,19 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* Price Trend Chart Section */}
+      <section id="price-trend" className="price-trend-section">
+        <div className="container">
+          <div className="section-header">
+            <span className="subtitle">Live Market Indices</span>
+            <h2 className="section-title">Industrial Price Trends</h2>
+            <p className="section-desc">Track real-time pricing trends of primary industrial commodities in Bangalore.</p>
+          </div>
+          
+          <PriceTrendChart />
         </div>
       </section>
 
@@ -1055,6 +1463,13 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         </div>
       </section>
 
+      {/* Logistics Truck Tracker Section */}
+      <section id="logistics-truck" className="logistics-tracker-section">
+        <div className="container">
+          <LogisticsTruckTracker />
+        </div>
+      </section>
+
       {/* About Us Section */}
       <section id="about">
         <div className="container">
@@ -1240,6 +1655,19 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
               <p className="why-desc">Large volume scrap operations are cleared in less than 24-48 hours from the approval of quote.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Accordion Section */}
+      <section id="faq" className="faq-section">
+        <div className="container">
+          <div className="section-header" style={{ textAlign: "center" }}>
+            <span className="subtitle">FAQ</span>
+            <h2 className="section-title">Frequently Asked Questions</h2>
+            <p className="section-desc" style={{ margin: "0.5rem auto 0" }}>Got questions about industrial scrap trading? Find clear answers to common inquiries below.</p>
+          </div>
+          
+          <FAQAccordion />
         </div>
       </section>
 
