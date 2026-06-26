@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 /* CSS Variables */
 :root {
-  --font-title: 'Sora', sans-serif;
+  --font-title: 'Playfair Display', serif;
   --font-heading: 'Space Grotesk', sans-serif;
-  --font-subheading: 'Outfit', sans-serif;
+  --font-subheading: 'Space Grotesk', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
   /* Color Palette */
@@ -2817,13 +2817,35 @@ footer {
 }
 
 
-/* typography mapping overrides */
+/* typography mapping overrides & writing styles */
 h1,
 h2,
 .hero-title,
-.section-title,
-.logo-text {
+.section-title {
   font-family: var(--font-title) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Elegant Italic accents for highlighted text in main titles */
+h1 span, 
+h2 span, 
+.hero-title span, 
+.section-title span {
+  font-family: var(--font-title) !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  /* preserve gradient/color styling while adding cursive serif feel */
+  background: inherit;
+  -webkit-background-clip: inherit;
+  -webkit-text-fill-color: inherit;
+}
+
+.logo-text {
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
 }
 
 h3,
@@ -2838,8 +2860,11 @@ h6,
 .receipt-section h4,
 .ticket-section h4 {
   font-family: var(--font-heading) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
 }
 
+/* Uppercase wide-spaced layout for subheadings & badges */
 .subtitle,
 .val-label,
 .qty-label,
@@ -2853,6 +2878,9 @@ h6,
 .comp-num,
 .stat-number {
   font-family: var(--font-subheading) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.12em !important;
+  font-weight: 700 !important;
 }
 
 body,
