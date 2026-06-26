@@ -223,7 +223,7 @@ export default function Home() {
         setScrolled(false);
       }
 
-      const sections = ["home", "services", "estimator", "gallery", "about", "why-us", "contact"];
+      const sections = ["home", "services", "estimator", "about", "why-us", "contact"];
       const scrollPosition = window.scrollY + 120;
 
       for (const sectionId of sections) {
@@ -470,13 +470,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                 onClick={() => setMobileMenuOpen(false)}
               >Schedule Pickup</a>
             </li>
-            <li>
-              <a 
-                href="#gallery" 
-                className={activeSection === "gallery" ? "active" : ""}
-                onClick={() => setMobileMenuOpen(false)}
-              >Gallery</a>
-            </li>
+
             <li>
               <a 
                 href="#about" 
@@ -1121,78 +1115,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         </div>
       </section>
 
-      {/* Operations Gallery Section */}
-      <section id="gallery" style={{ borderTop: "1px solid var(--border-color)", paddingTop: "5rem", paddingBottom: "5rem" }}>
-        <div className="container">
-          <div className="section-header">
-            <span className="subtitle">Operations Showcase</span>
-            <h2 className="section-title">Our Site Clearances in Action</h2>
-            <p className="section-desc">A visual overview of our high-volume scrap clearances, industrial machinery dismantling, and eco-compliant recycling operations.</p>
-          </div>
-          
-          <div className="gallery-grid">
-            {/* Photo 1 */}
-            <div className="gallery-card" onClick={() => {
-              const el = document.getElementById("estimator");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}>
-              <div className="gallery-image-box">
-                <img src={`${basePath}/gallery_it_waste.png`} alt="IT Park Server Room Decommissioning" />
-                <div className="gallery-overlay">
-                  <span className="gallery-tag">Corporate E-Waste</span>
-                  <h3 className="gallery-card-title">Server Room Decommissioning</h3>
-                  <p className="gallery-card-desc">Successful retrieval of 1,200+ servers, network racks, and heavy-duty UPS batteries from a major IT park facility.</p>
-                </div>
-              </div>
-            </div>
 
-            {/* Photo 2 */}
-            <div className="gallery-card" onClick={() => {
-              const el = document.getElementById("estimator");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}>
-              <div className="gallery-image-box">
-                <img src={`${basePath}/gallery_chiller_scrap.png`} alt="Central AC Chiller Plant Dismantling" />
-                <div className="gallery-overlay">
-                  <span className="gallery-tag">Chiller Plants</span>
-                  <h3 className="gallery-card-title">AC Chiller Plant Dismantling</h3>
-                  <p className="gallery-card-desc">Logistics and safe dismantling of a 300-ton central rooftop air conditioning unit and copper cooling towers.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Photo 3 */}
-            <div className="gallery-card" onClick={() => {
-              const el = document.getElementById("estimator");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}>
-              <div className="gallery-image-box">
-                <img src={`${basePath}/gallery_heavy_machinery.png`} alt="Industrial Generator Salvage" />
-                <div className="gallery-overlay">
-                  <span className="gallery-tag">Heavy Machinery</span>
-                  <h3 className="gallery-card-title">Industrial Generator Salvage</h3>
-                  <p className="gallery-card-desc">Heavy-crane extraction and clearance of two backup 500kVA backup diesel generator sets from a manufacturing site.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Photo 4 */}
-            <div className="gallery-card" onClick={() => {
-              const el = document.getElementById("estimator");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}>
-              <div className="gallery-image-box">
-                <img src={`${basePath}/gallery_copper_scrap.png`} alt="Bulk Copper Cable Clearance" />
-                <div className="gallery-overlay">
-                  <span className="gallery-tag">Electrical Scrap</span>
-                  <h3 className="gallery-card-title">Bulk Copper Cable Clearance</h3>
-                  <p className="gallery-card-desc">Sorting, dynamic weighment, and logistical clearance of over 15 tons of industrial armoured power cabling.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Why Choose Us Grid */}
       <section id="why-us" style={{ backgroundColor: "rgba(255,255,255,0.01)", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)" }}>
@@ -1395,7 +1318,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
             <ul className="footer-links">
               <li><a href="#about">About Us</a></li>
               <li><a href="#why-us">Why Choose Us</a></li>
-              <li><a href="#gallery">Gallery</a></li>
+
               <li><a href="#estimator">Schedule Pickup</a></li>
               <li><a href="#contact">Contact Us</a></li>
             </ul>
