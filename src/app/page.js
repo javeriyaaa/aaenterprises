@@ -159,6 +159,22 @@ export default function Home() {
 
   const fileInputRef = useRef(null);
 
+  // 3D Mouse Movement Tilt State & Handlers
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const containerRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
+    setTilt({ x: x * 20, y: -y * 20 });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
   // Toast utility
   const showToast = (message, type = "success") => {
     const id = Date.now() + Math.random();
@@ -525,7 +541,16 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
             
             <div className="hero-visual">
               <div className="visual-container">
-                <div className="gyro-perspective-container">
+                <div 
+                  ref={containerRef}
+                  className="gyro-perspective-container"
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                  style={{
+                    transform: `rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)`,
+                    transition: "transform 0.1s ease-out"
+                  }}
+                >
                   {/* Depth Particles */}
                   <div className="space-particles">
                     <div className="particle p-1"></div>
