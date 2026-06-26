@@ -150,70 +150,6 @@ function CountUpNumber({ end, duration = 1500, suffix = "" }) {
   return <span>{count.toLocaleString()}{suffix}</span>;
 }
 
-const FAQ_ITEMS = [
-  {
-    question: "What types of corporate scrap do you purchase?",
-    answer: "We purchase all types of corporate surplus, including blade servers, office laptops, centralized chiller plants, commercial generators, armoured copper cables, dynamos, electrical panels, and bulk metals from building deconstructions."
-  },
-  {
-    question: "How do you guarantee calibrated weight accuracy?",
-    answer: "We use digital industrial scales certified and stamped annually by the Department of Weights and Measures. Weighment is performed transparently in full view of your supervisors on-site."
-  },
-  {
-    question: "Will we receive green disposal and recycling certificates?",
-    answer: "Yes, we issue formal corporate recycling documents, green disposal compliance certificates, and technical destruction logs for security compliance audits."
-  },
-  {
-    question: "What is your payout settlement protocol?",
-    answer: "100% of the calculated asset value is paid instantly on-site via RTGS bank transfer, IMPS, or secure corporate payout, prior to load dispatch or vehicle release."
-  },
-  {
-    question: "Do you offer physical de-installation and hauling support?",
-    answer: "Absolutely. Our expert crew handles all physical de-installation, mechanical sorting, duct/wiring dismantling, structural load lifting, and logistics rigging without interrupting your operations."
-  }
-];
-
-function FAQAccordion() {
-  const [activeIndex, setActiveIndex] = useState(null);
-
-  const toggleFAQ = (index) => {
-    setActiveIndex(activeIndex === index ? null : index);
-  };
-
-  return (
-    <div className="faq-container">
-      {FAQ_ITEMS.map((item, idx) => {
-        const isActive = idx === activeIndex;
-        return (
-          <div 
-            key={idx} 
-            className={`faq-item ${isActive ? "active" : ""}`}
-          >
-            <button 
-              className="faq-header"
-              onClick={() => toggleFAQ(idx)}
-              aria-expanded={isActive}
-            >
-              <span className="faq-question">{item.question}</span>
-              <div className="faq-icon">
-                <i className="fa-solid fa-chevron-down"></i>
-              </div>
-            </button>
-            <div 
-              className="faq-answer-wrapper"
-              style={{ maxHeight: isActive ? "200px" : "0" }}
-            >
-              <div className="faq-answer">
-                {item.answer}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 export default function Home() {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
@@ -1295,18 +1231,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         </div>
       </section>
 
-      {/* FAQ Accordion Section */}
-      <section id="faq" className="faq-section">
-        <div className="container">
-          <div className="section-header" style={{ textAlign: "center" }}>
-            <span className="subtitle">FAQ</span>
-            <h2 className="section-title">Frequently Asked Questions</h2>
-            <p className="section-desc" style={{ margin: "0.5rem auto 0" }}>Got questions about industrial scrap trading? Find clear answers to common inquiries below.</p>
-          </div>
-          
-          <FAQAccordion />
-        </div>
-      </section>
+
 
       {/* Contact Us Section */}
       <section id="contact">
