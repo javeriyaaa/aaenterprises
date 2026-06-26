@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 /* CSS Variables */
 :root {
-  --font-heading: 'Space Grotesk', sans-serif;
+  --font-heading: 'Sora', sans-serif;
+  --font-subheading: 'Space Grotesk', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
   /* Color Palette */
@@ -2814,3 +2815,40 @@ footer {
   line-height: 1.5;
 }
 
+
+/* typography mapping overrides */
+.subtitle,
+.val-label,
+.qty-label,
+.info-label,
+.ticket-section h4,
+.receipt-section h4,
+.footer-col h4,
+.card-category-icon,
+.estimator-title,
+.category-title,
+.trust-badge,
+.hero-tagline,
+.ticker-item,
+.step-num,
+.comp-num,
+.logo-text,
+.stat-number {
+  font-family: var(--font-subheading) !important;
+}
+
+body,
+p,
+a,
+li,
+input,
+textarea,
+select,
+.qty-input-box,
+.receipt-info-text,
+.receipt-note,
+.val-subtext,
+.ticket-disclaimer,
+.footer-copy {
+  font-family: var(--font-body) !important;
+}
