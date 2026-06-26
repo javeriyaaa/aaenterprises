@@ -1121,8 +1121,8 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
       <section id="why-us" style={{ backgroundColor: "rgba(255,255,255,0.01)", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)" }}>
         <div className="container">
           <div className="section-header">
-            <span className="subtitle">Why Choose Us</span>
-            <h2 className="section-title">The AA Enterprises Advantage</h2>
+            <span className="subtitle">The AA Advantage</span>
+            <h2 className="section-title">Why Choose Us</h2>
             <p className="section-desc">How we set the benchmark for commercial scrap procurement in the region.</p>
           </div>
           
