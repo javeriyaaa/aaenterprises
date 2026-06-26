@@ -2,13 +2,60 @@
 
 import { useState, useEffect, useRef } from "react";
 
+const DAILY_RATES = [
+  { name: "Copper Armoured Cables", price: "₹480 - ₹525/kg", trend: "up" },
+  { name: "IT Server Blade Units", price: "₹3,200 - ₹4,500/unit", trend: "up" },
+  { name: "Aluminium Section Scrap", price: "₹145 - ₹168/kg", trend: "up" },
+  { name: "Split AC Units (1.5 Ton)", price: "₹4,200 - ₹5,500/unit", trend: "stable" },
+  { name: "Used Diesel Generator (DG)", price: "₹75,000 - ₹3,50,000/set", trend: "up" },
+  { name: "Lead-Acid Battery Cells", price: "₹92 - ₹105/kg", trend: "up" },
+  { name: "Heavy Brass Castings", price: "₹340 - ₹385/kg", trend: "stable" },
+  { name: "Heavy Structural Steel", price: "₹38 - ₹44/kg", trend: "up" },
+  { name: "IT Corporate Laptops", price: "₹2,500 - ₹4,800/unit", trend: "stable" }
+];
+
+const ITEM_VALUATIONS = {
+  // IT
+  "Laptops": { min: 2500, max: 4800, unit: "unit", defaultQty: 5 },
+  "Desktop Computers": { min: 1800, max: 3200, unit: "unit", defaultQty: 5 },
+  "Server Racks": { min: 8000, max: 25000, unit: "unit", defaultQty: 1 },
+  "UPS & Lead Batteries": { min: 92, max: 105, unit: "kg", defaultQty: 100 },
+  "Office Printers": { min: 1200, max: 3500, unit: "unit", defaultQty: 2 },
+  
+  // AC
+  "Split AC Units": { min: 4200, max: 5500, unit: "unit", defaultQty: 2 },
+  "Window AC Units": { min: 3000, max: 4500, unit: "unit", defaultQty: 2 },
+  "Centralized Chiller Plants": { min: 120000, max: 450000, unit: "unit", defaultQty: 1 },
+  "Outdoor AC Condenser Units": { min: 1500, max: 2800, unit: "unit", defaultQty: 2 },
+  "AHU & Ducting": { min: 40, max: 55, unit: "kg", defaultQty: 200 },
+  "AC Copper Tubing": { min: 460, max: 520, unit: "kg", defaultQty: 50 },
+  
+  // Cables & Wires
+  "Armoured Copper Cables": { min: 480, max: 525, unit: "kg", defaultQty: 100 },
+  "Aluminium Cables": { min: 145, max: 168, unit: "kg", defaultQty: 150 },
+  "Transformers": { min: 45000, max: 180000, unit: "unit", defaultQty: 1 },
+  "Distribution Panels": { min: 15000, max: 65000, unit: "unit", defaultQty: 1 },
+  
+  // Generators
+  "Used Industrial DG Sets": { min: 75000, max: 350000, unit: "set", defaultQty: 1 },
+  "Portable & Commercial Generators": { min: 12000, max: 45000, unit: "unit", defaultQty: 1 },
+  "Large Alternators & Dynamos": { min: 8000, max: 35000, unit: "unit", defaultQty: 1 },
+  "Diesel Engine Parts": { min: 35, max: 45, unit: "kg", defaultQty: 200 },
+  
+  // Metals
+  "Iron & Steel Scrap": { min: 38, max: 44, unit: "kg", defaultQty: 500 },
+  "Pure Copper Scrap": { min: 620, max: 680, unit: "kg", defaultQty: 50 },
+  "Brass Casting Scrap": { min: 340, max: 385, unit: "kg", defaultQty: 100 },
+  "Aluminium Scrap": { min: 135, max: 155, unit: "kg", defaultQty: 150 }
+};
+
 const CATEGORIES = {
   it: {
     label: "IT Scrap",
     icon: "fa-solid fa-desktop",
     title: "IT & Corporate Scrap",
     desc: "Complete e-waste disposal and asset recovery for IT companies, call centers, and corporate office parks.",
-    instruction: "Select the IT scrap items you want to sell:",
+    instruction: "Select items and enter quantity to sell:",
     items: [
       { value: "Laptops", label: "Laptops (Old/Broken)" },
       { value: "Desktop Computers", label: "Desktop Computers" },
@@ -22,7 +69,7 @@ const CATEGORIES = {
     icon: "fa-solid fa-snowflake",
     title: "AC Scrap & Chillers",
     desc: "Dismantling, recycling, and purchasing of all AC types (split AC, window AC, package units, and central chillers).",
-    instruction: "Select the AC scrap items you want to sell:",
+    instruction: "Select items and enter quantity to sell:",
     items: [
       { value: "Split AC Units", label: "Split AC Units (Indoor/Outdoor)" },
       { value: "Window AC Units", label: "Window AC Units" },
@@ -37,7 +84,7 @@ const CATEGORIES = {
     icon: "fa-solid fa-bolt",
     title: "Electric Cables & Wires",
     desc: "Buying copper and aluminium conductors with certified recovery and eco-friendly processing.",
-    instruction: "Select the electrical cable items you want to sell:",
+    instruction: "Select items and enter quantity to sell:",
     items: [
       { value: "Armoured Copper Cables", label: "Armoured Copper Cables" },
       { value: "Aluminium Cables", label: "Aluminium Cables" },
@@ -50,7 +97,7 @@ const CATEGORIES = {
     icon: "fa-solid fa-plug-circle-bolt",
     title: "Used Generators",
     desc: "We buy all types of second-hand and used generators, second-hand diesel generator (DG) sets, large alternators, dynamos, and engines.",
-    instruction: "Select the used generator items you want to sell:",
+    instruction: "Select items and enter quantity to sell:",
     items: [
       { value: "Used Industrial DG Sets", label: "Used Industrial DG Sets" },
       { value: "Portable & Commercial Generators", label: "Portable & Commercial Generators" },
@@ -63,7 +110,7 @@ const CATEGORIES = {
     icon: "fa-solid fa-cubes",
     title: "Bulk Scrap Metals",
     desc: "Highly accurate weighments and top pricing for raw metals from demolitions and turnarounds.",
-    instruction: "Select the raw metal scrap items you want to sell:",
+    instruction: "Select items and enter quantity to sell:",
     items: [
       { value: "Iron & Steel Scrap", label: "Iron / Steel Scrap" },
       { value: "Pure Copper Scrap", label: "Copper Scrap & Tubes" },
@@ -84,6 +131,7 @@ export default function Home() {
   // Estimator Form states
   const [activeTab, setActiveTab] = useState("it");
   const [selectedItems, setSelectedItems] = useState([]);
+  const [itemQuantities, setItemQuantities] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState([]);
   
   const [pickupForm, setPickupForm] = useState({
@@ -149,6 +197,21 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Calculate dynamic valuation range
+  const calculateValuationRange = () => {
+    let minTotal = 0;
+    let maxTotal = 0;
+    selectedItems.forEach(item => {
+      const qty = itemQuantities[item] || 0;
+      const val = ITEM_VALUATIONS[item];
+      if (val) {
+        minTotal += val.min * qty;
+        maxTotal += val.max * qty;
+      }
+    });
+    return { min: minTotal, max: maxTotal };
+  };
+
   // 3D Capsule click behavior
   const handle3DNodeClick = (category, item) => {
     const el = document.getElementById("estimator");
@@ -158,6 +221,10 @@ export default function Home() {
     setActiveTab(category);
     setSelectedItems(prev => {
       if (!prev.includes(item)) {
+        setItemQuantities(q => ({
+          ...q,
+          [item]: ITEM_VALUATIONS[item]?.defaultQty || 1
+        }));
         showToast(`Selected "${item}" to sell!`, "success");
         return [...prev, item];
       } else {
@@ -168,12 +235,21 @@ export default function Home() {
   };
 
   // Checkbox toggle
-  const handleCheckboxChange = (item) => {
+  const handleCheckboxChange = (itemVal) => {
     setSelectedItems(prev => {
-      if (prev.includes(item)) {
-        return prev.filter(i => i !== item);
+      if (prev.includes(itemVal)) {
+        setItemQuantities(q => {
+          const newQ = { ...q };
+          delete newQ[itemVal];
+          return newQ;
+        });
+        return prev.filter(i => i !== itemVal);
       } else {
-        return [...prev, item];
+        setItemQuantities(q => ({
+          ...q,
+          [itemVal]: ITEM_VALUATIONS[itemVal]?.defaultQty || 1
+        }));
+        return [...prev, itemVal];
       }
     });
   };
@@ -217,9 +293,15 @@ export default function Home() {
       const ticketId = `AAE-2026-${randomId}`;
 
       const waPhone = "919845189902"; // Ashfaque Ahmed
+      const valuationRange = calculateValuationRange();
+
       const itemsList = selectedItems.length > 0 
-        ? selectedItems.map(item => `• ${item}`).join("\n") 
+        ? selectedItems.map(item => `• ${item}: ${itemQuantities[item]} ${ITEM_VALUATIONS[item]?.unit || "units"}`).join("\n") 
         : "• General Bulk Scrap Audit";
+
+      const valText = valuationRange.min > 0
+        ? `\n*Est. Payout Range:* ₹${valuationRange.min.toLocaleString('en-IN')} - ₹${valuationRange.max.toLocaleString('en-IN')} (Bengaluru Market Rates)\n`
+        : "";
 
       const waMessage = `Hi AA Enterprises! I have submitted a scrap pickup inquiry.
 
@@ -228,7 +310,7 @@ export default function Home() {
 *Phone:* ${pickupForm.phone}
 ${pickupForm.email ? `*Email:* ${pickupForm.email}\n` : ""}${pickupForm.company ? `*Company:* ${pickupForm.company}\n` : ""}*Items to Sell:*
 ${itemsList}
-
+${valText}
 *Location & Details:*
 ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attached: ${uploadedFiles.length} photos of scrap]` : ""}`;
 
@@ -245,6 +327,8 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
         company: pickupForm.company,
         message: pickupForm.message,
         items: selectedItems,
+        quantities: { ...itemQuantities },
+        valuationRange: valuationRange,
         photoUrls: photoUrls,
         whatsappUrl: waUrl
       });
@@ -269,6 +353,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
       message: ""
     });
     setSelectedItems([]);
+    setItemQuantities({});
     setUploadedFiles([]);
     setSuccessTicket(null);
     showToast("Form reset. You can submit another request.", "success");
@@ -389,6 +474,27 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
           </ul>
         </div>
       </header>
+
+      {/* Live Scrap Rates Ticker */}
+      <div className="rate-ticker-section">
+        <div className="ticker-wrap">
+          <div className="ticker">
+            {[...DAILY_RATES, ...DAILY_RATES].map((item, idx) => (
+              <div key={idx} className="ticker-item">
+                <span className="item-name">{item.name}</span>
+                <span className="item-price">
+                  {item.price}
+                  {item.trend === "up" ? (
+                    <span className="price-up"><i className="fa-solid fa-caret-up"></i> Live</span>
+                  ) : (
+                    <span className="price-up" style={{ color: "var(--text-muted)" }}><i className="fa-solid fa-minus"></i> Stable</span>
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section id="home" className="hero">
@@ -600,16 +706,63 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                         {cat.items.map((item, idx) => {
                           const isChecked = selectedItems.includes(item.value);
                           return (
-                            <label key={idx} className="checkbox-card">
-                              <input 
-                                type="checkbox" 
-                                className="scrap-checkbox" 
-                                checked={isChecked}
-                                onChange={() => handleCheckboxChange(item.value)}
-                              />
-                              <span className="checkmark"><i className="fa-solid fa-check"></i></span>
-                              <span className="label-text">{item.label}</span>
-                            </label>
+                            <div key={idx} className="checkbox-card-wrapper" style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
+                              <label className="checkbox-card">
+                                <input 
+                                  type="checkbox" 
+                                  className="scrap-checkbox" 
+                                  checked={isChecked}
+                                  onChange={() => handleCheckboxChange(item.value)}
+                                />
+                                <span className="checkmark"><i className="fa-solid fa-check"></i></span>
+                                <span className="label-text">{item.label}</span>
+                              </label>
+                              
+                              {isChecked && (
+                                <div className="quantity-control-panel" onClick={(e) => e.stopPropagation()}>
+                                  <span className="qty-label">Est. Quantity:</span>
+                                  <div className="qty-actions">
+                                    <button 
+                                      type="button" 
+                                      className="qty-btn"
+                                      onClick={() => {
+                                        setItemQuantities(prev => ({
+                                          ...prev,
+                                          [item.value]: Math.max(1, (prev[item.value] || 1) - (item.value.includes("Cables") || item.value.includes("Scrap") || item.value.includes("Tubing") || item.value.includes("AHU") || item.value.includes("Parts") ? 10 : 1))
+                                        }));
+                                      }}
+                                    >
+                                      -
+                                    </button>
+                                    <input 
+                                      type="number" 
+                                      className="qty-input-box" 
+                                      value={itemQuantities[item.value] || 0}
+                                      onChange={(e) => {
+                                        const val = parseInt(e.target.value) || 0;
+                                        setItemQuantities(prev => ({
+                                          ...prev,
+                                          [item.value]: Math.max(1, val)
+                                        }));
+                                      }}
+                                    />
+                                    <button 
+                                      type="button" 
+                                      className="qty-btn"
+                                      onClick={() => {
+                                        setItemQuantities(prev => ({
+                                          ...prev,
+                                          [item.value]: (prev[item.value] || 1) + (item.value.includes("Cables") || item.value.includes("Scrap") || item.value.includes("Tubing") || item.value.includes("AHU") || item.value.includes("Parts") ? 10 : 1)
+                                        }));
+                                      }}
+                                    >
+                                      +
+                                    </button>
+                                    <span className="qty-unit">{ITEM_VALUATIONS[item.value]?.unit || "unit"}</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           );
                         })}
                       </div>
@@ -623,6 +776,25 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
             <div className="estimator-summary" style={{ backgroundColor: "var(--bg-surface)", padding: "3rem", display: "flex", flexDirection: "column", justifyContent: "flex-start", border: "1px solid var(--border-color)", borderRadius: "20px", position: "relative" }}>
               {!successTicket ? (
                 <div id="pickup-form-wrapper">
+                  {/* Real-time Payout Valuation Range Box */}
+                  <div className="valuation-display-box">
+                    <div className="val-label">Indicative Valuation Range</div>
+                    <div className="val-amount">
+                      {selectedItems.length > 0 ? (
+                        <>
+                          ₹{calculateValuationRange().min.toLocaleString('en-IN')} - ₹{calculateValuationRange().max.toLocaleString('en-IN')}
+                        </>
+                      ) : (
+                        "₹0"
+                      )}
+                    </div>
+                    <div className="val-subtext">
+                      {selectedItems.length > 0 
+                        ? "*Based on indicative daily Bangalore spot rates" 
+                        : "Select items on the left to calculate indicative value"}
+                    </div>
+                  </div>
+
                   <h3 className="estimator-title" style={{ marginBottom: "2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
                     <i className="fa-solid fa-user-pen"></i> 2. Contact Details
                   </h3>
@@ -738,90 +910,174 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                 </div>
               ) : (
                 /* Digital Inspection Receipt Ticket */
-                <div id="pickup-success-ticket" className="success-ticket-container">
-                  <div className="ticket-header">
-                    <div className="ticket-badge"><i className="fa-solid fa-receipt"></i> INQUIRY GENERATED</div>
-                    <div className="ticket-id" id="ticket-id-val">{successTicket.id}</div>
+                <div id="pickup-success-ticket" className="manifest-receipt">
+                  <div className="receipt-header">
+                    <div className="receipt-title-badge"><i className="fa-solid fa-receipt"></i> Manifest Logged</div>
+                    <div className="receipt-id" id="ticket-id-val">{successTicket.id}</div>
                   </div>
                   
-                  <div className="ticket-body">
-                    <div className="ticket-section">
+                  <div className="receipt-body">
+                    <div className="receipt-section">
                       <h4>Client Information</h4>
-                      <p><strong>Name:</strong> <span id="ticket-name-val">{successTicket.name}</span></p>
-                      <p><strong>Phone:</strong> <span id="ticket-phone-val">{successTicket.phone}</span></p>
-                      {successTicket.email && <p><strong>Email:</strong> <span>{successTicket.email}</span></p>}
-                      {successTicket.company && <p><strong>Company:</strong> <span>{successTicket.company}</span></p>}
+                      <p className="receipt-info-text">
+                        <strong>Name:</strong> {successTicket.name}<br />
+                        <strong>Phone:</strong> {successTicket.phone}<br />
+                        {successTicket.email && <><strong>Email:</strong> {successTicket.email}<br /></>}
+                        {successTicket.company && <><strong>Company:</strong> {successTicket.company}<br /></>}
+                      </p>
                     </div>
                     
-                    <div className="ticket-section">
-                      <h4>Selected Items to Sell</h4>
-                      <div className="ticket-tags" id="ticket-items-val">
+                    <div className="receipt-section">
+                      <h4>Materials Log & Quantities</h4>
+                      <div className="receipt-tags-list">
                         {successTicket.items.length > 0 ? (
-                          successTicket.items.map((item, idx) => (
-                            <span key={idx} className="ticket-tag">
-                              <i className="fa-solid fa-check"></i> {item}
-                            </span>
-                          ))
+                          successTicket.items.map((item, idx) => {
+                            const qty = successTicket.quantities[item] || 0;
+                            const valInfo = ITEM_VALUATIONS[item];
+                            return (
+                              <div key={idx} className="receipt-tag" style={{ display: "block", marginBottom: "0.5rem" }}>
+                                <i className="fa-solid fa-check" style={{ color: "var(--primary-light)" }}></i> 
+                                <strong style={{ color: "var(--text-primary)" }}> {item}</strong>: {qty} {valInfo?.unit || "units"} 
+                                <span style={{ color: "var(--text-secondary)", fontSize: "0.75rem", marginLeft: "0.5rem" }}>
+                                  (Indicative: ₹{(valInfo?.min * qty).toLocaleString('en-IN')} - ₹{(valInfo?.max * qty).toLocaleString('en-IN')})
+                                </span>
+                              </div>
+                            );
+                          })
                         ) : (
-                          <span className="ticket-tag" style={{ borderColor: "var(--secondary)", color: "var(--secondary)" }}>
+                          <div className="receipt-tag">
                             <i className="fa-solid fa-circle-info"></i> General Site Clearance Audit
-                          </span>
+                          </div>
                         )}
                       </div>
                     </div>
+
+                    {successTicket.valuationRange && successTicket.valuationRange.min > 0 && (
+                      <div className="receipt-section" style={{ background: "rgba(255,255,255,0.01)", border: "1px solid var(--border-color)", padding: "1rem", borderRadius: "8px" }}>
+                        <h4 style={{ color: "var(--primary-light)" }}>Estimated Payout Range</h4>
+                        <p style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--primary-light)", fontFamily: "var(--font-heading)" }}>
+                          ₹{successTicket.valuationRange.min.toLocaleString('en-IN')} - ₹{successTicket.valuationRange.max.toLocaleString('en-IN')}
+                        </p>
+                        <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", marginTop: "0.25rem" }}>*Valuation is indicative and finalized post calibrated digital scale weight checks.</span>
+                      </div>
+                    )}
                     
                     {successTicket.message && (
-                      <div className="ticket-section">
-                        <h4>Location & Details</h4>
-                        <p className="ticket-msg-text">{successTicket.message}</p>
+                      <div className="receipt-section">
+                        <h4>Location & Logistics Notes</h4>
+                        <p className="receipt-note">{successTicket.message}</p>
                       </div>
                     )}
                     
                     {successTicket.photoUrls.length > 0 && (
-                      <div className="ticket-section">
-                        <h4>Attached Photos</h4>
-                        <div className="ticket-photos-grid">
+                      <div className="receipt-section">
+                        <h4>Uploaded Media Logs</h4>
+                        <div className="ticket-photos-grid" style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
                           {successTicket.photoUrls.map((url, idx) => (
-                            <img key={idx} className="ticket-photo-item" src={url} alt={`Upload ${idx}`} />
+                            <img key={idx} className="ticket-photo-item" src={url} alt={`Upload ${idx}`} style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "4px", border: "1px solid var(--border-color)" }} />
                           ))}
                         </div>
                       </div>
                     )}
                     
-                    <div className="ticket-disclaimer">
-                      <i className="fa-solid fa-info-circle"></i> AA Enterprises is operated by Altaf Ahmed & Ashfaque Ahmed. An inspector will contact you within 2-4 hours to finalize weights and immediate bank transfer payments.
+                    {/* CSS Barcode */}
+                    <div className="receipt-barcode-box">
+                      <div className="barcode-lines"></div>
+                      <div className="barcode-val">{successTicket.id}</div>
+                    </div>
+
+                    <div className="official-seal">
+                      <span>AAE Verified</span>
+                      <span style={{ fontSize: "0.38rem", marginTop: "2px" }}>Bangalore</span>
+                    </div>
+
+                    <div className="ticket-disclaimer" style={{ fontSize: "0.75rem", color: "var(--text-muted)", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", marginTop: "1rem" }}>
+                      <i className="fa-solid fa-info-circle"></i> AA Enterprises logistics crew will contact you within 2 hours. Final payment is issued via instantaneous online IMPS/NEFT transfer on-site.
                     </div>
                   </div>
                   
-                  <div className="ticket-actions">
+                  <div className="ticket-actions" style={{ padding: "0 1.5rem 1.5rem 1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                     <a 
                       href={successTicket.whatsappUrl} 
                       id="btn-ticket-whatsapp" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="btn-ticket-primary"
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", background: "linear-gradient(135deg, #059669 0%, #10b981 100%)", color: "white", padding: "0.85rem", borderRadius: "8px", fontWeight: "600" }}
                     >
-                      <i className="fa-brands fa-whatsapp"></i> Send to WhatsApp
+                      <i className="fa-brands fa-whatsapp"></i> Send Manifest to WhatsApp
                     </a>
-                    <button 
-                      type="button" 
-                      id="btn-ticket-print" 
-                      className="btn-ticket-secondary"
-                      onClick={handlePrintTicket}
-                    >
-                      <i className="fa-solid fa-print"></i> Print Ticket
-                    </button>
-                    <button 
-                      type="button" 
-                      id="btn-ticket-reset" 
-                      className="btn-ticket-link"
-                      onClick={handleResetPickup}
-                    >
-                      Submit Another Request
-                    </button>
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <button 
+                        type="button" 
+                        id="btn-ticket-print" 
+                        className="btn-ticket-secondary"
+                        style={{ flex: 1, padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--border-color)", background: "transparent", color: "var(--text-primary)", cursor: "pointer" }}
+                        onClick={handlePrintTicket}
+                      >
+                        <i className="fa-solid fa-print"></i> Print Receipt
+                      </button>
+                      <button 
+                        type="button" 
+                        id="btn-ticket-reset" 
+                        className="btn-ticket-link"
+                        style={{ flex: 1, padding: "0.75rem", borderRadius: "8px", border: "none", background: "transparent", color: "var(--text-muted)", cursor: "pointer", textDecoration: "underline" }}
+                        onClick={handleResetPickup}
+                      >
+                        Submit Another
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Process & Compliance Section */}
+      <section id="process" style={{ borderTop: "1px solid var(--border-color)", paddingBottom: "6rem", background: "rgba(255,255,255,0.005)" }}>
+        <div className="container">
+          <div className="section-header">
+            <span className="subtitle">Operational Pipeline</span>
+            <h2 className="section-title">Our 5-Step Process</h2>
+            <p className="section-desc">We follow a transparent, highly calibrated operational pipeline to ensure safety, fair pricing, and green compliance.</p>
+          </div>
+          
+          <div className="compliance-timeline">
+            <div className="compliance-card">
+              <span className="comp-num">01</span>
+              <div className="comp-icon"><i className="fa-solid fa-user-pen"></i></div>
+              <h3 className="comp-title">Inquiry & Est.</h3>
+              <p className="comp-desc">Select your scrap items online or contact us via WhatsApp to receive an immediate indicative valuation range.</p>
+            </div>
+            
+            <div className="compliance-card">
+              <span className="comp-num">02</span>
+              <div className="comp-icon"><i className="fa-solid fa-truck-ramp-box"></i></div>
+              <h3 className="comp-title">Site Assessment</h3>
+              <p className="comp-desc">Our expert loaders and safety inspectors visit your Bengaluru premises within 2-4 hours for a complete site audit.</p>
+            </div>
+            
+            <div className="compliance-card">
+              <span className="comp-num">03</span>
+              <div className="comp-icon"><i className="fa-solid fa-scale-balanced"></i></div>
+              <h3 className="comp-title">Calibrated Weight</h3>
+              <p className="comp-desc">All scrap is weighed using state-of-the-art calibrated digital scales, fully verified in your presence.</p>
+            </div>
+            
+            <div className="compliance-card">
+              <span className="comp-num">04</span>
+              <div className="comp-icon"><i className="fa-solid fa-money-bill-transfer"></i></div>
+              <h3 className="comp-title">Instant Settlement</h3>
+              <p className="comp-desc">Get paid instantly via online bank transfer (IMPS/NEFT) before any materials leave your company premises.</p>
+            </div>
+            
+            <div className="compliance-card">
+              <span className="comp-num">05</span>
+              <div className="comp-icon"><i className="fa-solid fa-recycle"></i></div>
+              <h3 className="comp-title">Compliant Disposal</h3>
+              <p className="comp-desc">We issue official E-Waste destruction logs and Green Recycling Certificates, ensuring complete regulatory compliance.</p>
             </div>
           </div>
         </div>
