@@ -1094,14 +1094,7 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                   </div>
                 </div>
                 
-                <div className="about-feature-item">
-                  <div className="feature-icon"><i className="fa-solid fa-file-shield"></i></div>
-                  <div>
-                    <h4 className="feature-title">Disposal Certificates</h4>
-                    <p className="feature-desc">Official compliance certification and secure data destruction logs.</p>
-                  </div>
-                </div>
-                
+
                 <div className="about-feature-item">
                   <div className="feature-icon"><i className="fa-solid fa-money-bill-transfer"></i></div>
                   <div>
