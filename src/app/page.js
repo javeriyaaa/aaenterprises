@@ -1095,10 +1095,10 @@ ${pickupForm.message || "Not specified"}${uploadedFiles.length > 0 ? `\n\n[Attac
                 </div>
                 
                 <div className="about-feature-item">
-                  <div className="feature-icon"><i className="fa-solid fa-truck-ramp-box"></i></div>
+                  <div className="feature-icon"><i className="fa-solid fa-file-shield"></i></div>
                   <div>
-                    <h4 className="feature-title">In-house Logistical Team</h4>
-                    <p className="feature-desc">Own trucks, loaders, and expert dismantling crews.</p>
+                    <h4 className="feature-title">Disposal Certificates</h4>
+                    <p className="feature-desc">Official compliance certification and secure data destruction logs.</p>
                   </div>
                 </div>
                 
